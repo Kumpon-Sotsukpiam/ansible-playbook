@@ -40,7 +40,6 @@
 
     - name: Open port 8080 in firewall
       firewalld:
-        service: jenkins
         port: 8080/tcp
         permanent: yes
         state: enabled
