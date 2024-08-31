@@ -5,6 +5,12 @@
   become_user: root
 
   tasks:
+    - name: Install required dependencies
+      dnf:
+        name:
+          - fontconfig
+          - java-17-openjdk
+        state: present
     - name: Download Jenkins repo
       ansible.builtin.get_url:
         url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
