@@ -1,0 +1,52 @@
+---
+- name: Install Jenkins on CentOS 9
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install required dependencies
+      yum:
+        name:
+          - java-11-openjdk
+          - wget
+        state: present
+
+    - name: Add Jenkins repository
+      ansible.builtin.yum_repository:
+        name: jenkins
+        description: Jenkins Repo
+        baseurl: http://pkg.jenkins.io/redhat-stable/jenkins.repo
+        gpgcheck: yes
+        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+    - name: Install Jenkins
+      yum:
+        name: jenkins
+        state: present
+
+    - name: Start and enable Jenkins service
+      systemd:
+        name: jenkins
+        state: started
+        enabled: yes
+
+    - name: Open port 8080 in firewall
+      firewalld:
+        service: jenkins
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+
+    - name: Reload firewalld to apply changes
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded
+
+    - name: Display initial Jenkins admin password
+      command: cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: jenkins_admin_password
+
+    - name: Print the Jenkins admin password
+      debug:
+        msg: "Jenkins initial admin password: {{ jenkins_admin_password.stdout }}"
