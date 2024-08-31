@@ -8,20 +8,29 @@
     - name: Install required dependencies
       yum:
         name:
+          - fontconfig
           - java-11-openjdk
           - wget
         state: present
 
-    - name: Add Jenkins repository
-      ansible.builtin.yum_repository:
-        name: jenkins
-        description: Jenkins Repo
-        baseurl: https://pkg.jenkins.io/redhat-stable/jenkins.repo
-        gpgcheck: yes
-        gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+    - name: Download Jenkins repo
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+        mode: '0644'
+
+    - name: Import Jenkins GPG key
+      rpm_key:
+        state: present
+        key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+
+    - name: Upgrade all packages
+      dnf:
+        name: '*'
+        state: latest
 
     - name: Install Jenkins
-      yum:
+      dnf:
         name: jenkins
         state: present
 
