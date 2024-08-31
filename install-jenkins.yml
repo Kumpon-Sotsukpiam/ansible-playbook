@@ -2,6 +2,7 @@
 - name: Install Jenkins on CentOS 9
   hosts: all
   become: yes
+  become_user: root
 
   tasks:
     - name: Install required dependencies
